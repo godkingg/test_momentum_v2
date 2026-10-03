@@ -1,0 +1,64 @@
+name: Report on demand (slash command /report)
+
+# Được Cloudflare Worker kích hoạt (workflow_dispatch) mỗi khi ai đó gõ /report trong Discord.
+# Có thể chạy tay: Actions → "Report on demand" → Run workflow (cần ID kênh Discord).
+# Không ghi/commit state/ — báo cáo theo yêu cầu không làm thay đổi sổ lệnh của báo cáo theo lịch.
+on:
+  workflow_dispatch:
+    inputs:
+      channel_id:
+        description: "ID kênh Discord nhận báo cáo"
+        required: true
+      requester_id:
+        description: "ID người gọi lệnh (được ping khi xong)"
+        required: false
+        default: ""
+      asof:
+        description: "YYYY-MM-DD: báo cáo cuối phiên của ngày đã qua (để trống = ngay bây giờ)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-report.txt
+
+      - name: Cài thư viện
+        run: |
+          pip install -r requirements-report.txt
+          pip install -U --extra-index-url https://vnstocks.com/api/simple vnstock vnai
+
+      - name: Tạo và gửi báo cáo
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}      # dự phòng nếu bot không đăng được vào kênh
+          INPUT_CHANNEL_ID: ${{ inputs.channel_id }}
+          INPUT_REQUESTER_ID: ${{ inputs.requester_id }}
+          INPUT_ASOF: ${{ inputs.asof }}
+        run: |
+          ARGS=(--mode auto --on-demand --channel-id "$INPUT_CHANNEL_ID")
+          [ -n "$INPUT_REQUESTER_ID" ] && ARGS+=(--requester-id "$INPUT_REQUESTER_ID")
+          [ -n "$INPUT_ASOF" ] && ARGS+=(--asof "$INPUT_ASOF")
+          python daily_report.py "${ARGS[@]}"
+
+      - name: Lưu ảnh/HTML làm artifact (dự phòng, giữ 7 ngày)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-on-demand-${{ github.run_id }}
+          path: reports/daily/
+          retention-days: 7
+          if-no-files-found: ignore

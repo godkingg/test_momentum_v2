@@ -1,0 +1,108 @@
+name: Daily report (Discord)
+
+# GitHub Actions dùng UTC. Giờ Việt Nam = UTC+7 (không có giờ mùa hè).
+# Lịch được đặt SỚM ~10 phút so với giờ hẹn để bù độ trễ thường gặp của GitHub (có thể trễ 5–30 phút lúc cao điểm);
+# script tự chờ tới đúng 14:00 / 15:00 giờ VN. Nếu GitHub trễ quá giờ hẹn thì chạy ngay khi được khởi động.
+on:
+  schedule:
+    - cron: "50 6 * * 1-5"    # 13:50 VN (thứ 2–6) → báo cáo "lệnh dự kiến" 14:00
+    - cron: "50 7 * * 1-5"    # 14:50 VN (thứ 2–6) → báo cáo "cuối phiên" 15:00
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview (14:00) hoặc final (15:00)"
+        type: choice
+        options: [final, preview]
+        default: final
+      asof:
+        description: "Chạy cho ngày YYYY-MM-DD (để trống = hôm nay). Dùng để test vào cuối tuần; KHÔNG commit state"
+        required: false
+        default: ""
+      no_discord:
+        description: "Chỉ tạo file, không gửi Discord (và không commit state)"
+        type: boolean
+        default: false
+      refit_weights:
+        description: "Ước lượng lại trọng số IC (đổi lịch sử mô phỏng — chỉ làm khi có chủ ý)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write            # để commit thư mục state/ (sổ lệnh, trọng số đóng băng)
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-report.txt
+
+      - name: Cài thư viện
+        run: |
+          pip install -r requirements-report.txt
+          pip install -U --extra-index-url https://vnstocks.com/api/simple vnstock vnai
+
+      - name: Xác định chế độ
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$EVENT" = "schedule" ]; then
+            if [ "$SCHEDULE" = "50 6 * * 1-5" ]; then echo "mode=preview" >> "$GITHUB_OUTPUT"; else echo "mode=final" >> "$GITHUB_OUTPUT"; fi
+          else
+            echo "mode=${INPUT_MODE:-final}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Chạy báo cáo
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_MENTION: ${{ vars.DISCORD_MENTION }}
+          MODE: ${{ steps.mode.outputs.mode }}
+          INPUT_ASOF: ${{ inputs.asof }}
+          INPUT_NO_DISCORD: ${{ inputs.no_discord }}
+          INPUT_REFIT: ${{ inputs.refit_weights }}
+        run: |
+          ARGS=(--mode "$MODE")
+          [ -n "$INPUT_ASOF" ] && ARGS+=(--asof "$INPUT_ASOF")
+          [ "$INPUT_NO_DISCORD" = "true" ] && ARGS+=(--no-discord)
+          [ "$INPUT_REFIT" = "true" ] && ARGS+=(--refit-weights)
+          python daily_report.py "${ARGS[@]}"
+
+      - name: Lưu ảnh/HTML làm artifact (dự phòng, giữ 14 ngày)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-report-${{ steps.mode.outputs.mode }}
+          path: reports/daily/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Commit state/ (sổ lệnh, trọng số IC, nhật ký)
+        if: success() && inputs.asof == '' && inputs.no_discord != true
+        env:
+          MODE: ${{ steps.mode.outputs.mode }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state
+          if git diff --cached --quiet; then
+            echo "state/ không đổi."
+          else
+            git commit -m "chore(state): ${MODE} $(TZ=Asia/Ho_Chi_Minh date +%F)"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            git push
+          fi

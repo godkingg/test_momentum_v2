@@ -1,0 +1,129 @@
+{
+  "engine": "v2",
+  "window": [
+    "2024-01-12",
+    "2026-09-25"
+  ],
+  "n_days": 670,
+  "cost_rate": 0.0023,
+  "universe": [
+    "ACB",
+    "BID",
+    "BSR",
+    "CTG",
+    "FPT",
+    "GAS",
+    "GVR",
+    "HDB",
+    "HPG",
+    "LPB",
+    "MBB",
+    "MCH",
+    "MSN",
+    "MWG",
+    "SAB",
+    "SHB",
+    "SSB",
+    "SSI",
+    "STB",
+    "TCB",
+    "VCB",
+    "VHM",
+    "VIB",
+    "VIC",
+    "VJC",
+    "VNM",
+    "VPB",
+    "VRE"
+  ],
+  "table": {
+    "IC-Weighted Composite (net)": {
+      "Total Return": 0.8030652269,
+      "Ann Return": 0.2482192304,
+      "Ann Vol": 0.2142990819,
+      "Sharpe": 1.1582841522,
+      "Max DD": -0.233624094,
+      "Calmar": 1.0624727362,
+      "Sharpe SE": 0.6140794598,
+      "Rank IC": 0.0441620899,
+      "t(IC, adj)": 1.8716724602,
+      "t(excess vs 1/N)": 0.1124059712,
+      "Gross Sharpe": 1.4061033885,
+      "Cost đã trả": 0.1060309127,
+      "Số lệnh BUY": 290.0,
+      "Hold TB (ngày)": 41.1993006993,
+      "Win rate": 0.4895104895
+    },
+    "Single Factor (Mom_6_1) (net)": {
+      "Total Return": 1.0656355008,
+      "Ann Return": 0.3137048564,
+      "Ann Vol": 0.2105682037,
+      "Sharpe": 1.4898016461,
+      "Max DD": -0.1887443938,
+      "Calmar": 1.6620618505,
+      "Sharpe SE": 0.6144805126,
+      "Rank IC": 0.0175672494,
+      "t(IC, adj)": 0.7221400011,
+      "t(excess vs 1/N)": 0.9703158603,
+      "Gross Sharpe": 1.7082731422,
+      "Cost đã trả": 0.0861806349,
+      "Số lệnh BUY": 289.0,
+      "Hold TB (ngày)": 45.8480565371,
+      "Win rate": 0.5229681979
+    },
+    "XGBoost walk-forward (net)": {
+      "Total Return": 1.1923264793,
+      "Ann Return": 0.3434486503,
+      "Ann Vol": 0.2271857179,
+      "Sharpe": 1.5117528223,
+      "Max DD": -0.2064856603,
+      "Calmar": 1.6633050923,
+      "Sharpe SE": 0.6145011127,
+      "Rank IC": 0.0223196557,
+      "t(IC, adj)": 1.1693016179,
+      "t(excess vs 1/N)": 1.1301354235,
+      "Gross Sharpe": 2.1818954988,
+      "Cost đã trả": 0.2808719841,
+      "Số lệnh BUY": 442.0,
+      "Hold TB (ngày)": 14.9908675799,
+      "Win rate": 0.4908675799
+    },
+    "1/N Equal-Weight": {
+      "Total Return": 0.8002794834,
+      "Ann Return": 0.2474935328,
+      "Ann Vol": 0.1839063634,
+      "Sharpe": 1.3457583969,
+      "Max DD": -0.1675342858,
+      "Calmar": 1.4772709451,
+      "Sharpe SE": 0.6143057008,
+      "Rank IC": null,
+      "t(IC, adj)": null,
+      "t(excess vs 1/N)": null,
+      "Gross Sharpe": null,
+      "Cost đã trả": null,
+      "Số lệnh BUY": null,
+      "Hold TB (ngày)": null,
+      "Win rate": null
+    }
+  },
+  "engine_gap": {
+    "IC-Weighted Composite": {
+      "Sharpe (engine cũ)": 1.9411225043,
+      "Sharpe (v2)": 1.1582841522,
+      "Δ cũ − v2": 0.7828383522,
+      "Sharpe SE": 0.6140794598
+    },
+    "Single Factor (Mom_6_1)": {
+      "Sharpe (engine cũ)": 2.1799724585,
+      "Sharpe (v2)": 1.4898016461,
+      "Δ cũ − v2": 0.6901708124,
+      "Sharpe SE": 0.6144805126
+    },
+    "XGBoost walk-forward": {
+      "Sharpe (engine cũ)": 2.0615230791,
+      "Sharpe (v2)": 1.5117528223,
+      "Δ cũ − v2": 0.5497702568,
+      "Sharpe SE": 0.6145011127
+    }
+  }
+}

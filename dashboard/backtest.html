@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentum + Exit Rules — Backtest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="vendor_chart.js"></script>
+<script src="embed_data.js"></script>
+<style>
+  :root{
+    --bg:#0A0D12; --panel:#12161D; --panel-2:#161B23; --border:#1F2530;
+    --text:#E7EAEE; --muted:#6B7480; --muted-2:#8891A0;
+    --up:#E5484D; --down:#33C481; --accent:#7C9CFF; --accent-2:#F0B90B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; }
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  header{
+    padding:28px 32px 20px; border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;
+  }
+  .title-block h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; letter-spacing:-0.01em; }
+  .title-block h1 .sep{color:var(--muted); font-weight:500; margin:0 6px;}
+  .title-block p{color:var(--muted-2); font-size:13.5px; margin-top:6px; max-width:640px; line-height:1.5;}
+  nav a{
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--muted-2);
+    text-decoration:none; border:1px solid var(--border); padding:8px 14px;
+    border-radius:3px; transition:.15s;
+  }
+  nav a:hover{border-color:var(--accent); color:var(--accent);}
+  nav a.active{border-color:var(--accent); color:var(--accent);}
+
+  main{padding:20px 32px 48px; max-width:1180px;}
+
+  .verdict{
+    margin:20px 0; padding:16px 20px; border-radius:6px; font-size:14px; line-height:1.6;
+    border:1px solid; font-family:'JetBrains Mono',monospace;
+  }
+  .verdict.warn{ background:rgba(240,185,11,0.08); border-color:rgba(240,185,11,0.35); color:#D9AA3E; }
+  .verdict.win{ background:rgba(51,196,129,0.08); border-color:rgba(51,196,129,0.35); color:var(--down); }
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:18px 20px; margin-bottom:20px; }
+  .panel-title{ font-size:12.5px; color:var(--muted-2); font-family:'JetBrains Mono',monospace; margin-bottom:14px; letter-spacing:.02em; }
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{ text-align:left; font-size:11px; color:var(--muted); font-weight:500; padding:8px 10px; border-bottom:1px solid var(--border); }
+  th.num, td.num{text-align:right;}
+  td{ padding:9px 10px; border-bottom:1px solid var(--border); font-family:'JetBrains Mono',monospace; }
+  tr:last-child td{border-bottom:none;}
+  .pos{color:var(--down);} .neg{color:var(--up);}
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  @media(max-width:780px){ .stat-grid{grid-template-columns:repeat(2,1fr);} }
+  .stat{ background:var(--panel-2); border:1px solid var(--border); border-radius:5px; padding:14px 16px; }
+  .stat .label{ font-size:11.5px; color:var(--muted); margin-bottom:6px; }
+  .stat .value{ font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; }
+  .stat .value.pos{color:var(--down);} .stat .value.neg{color:var(--up);}
+
+  .chart-wrap{ height:320px; position:relative; }
+  .chart-fallback{ display:none; padding:40px 20px; text-align:center; color:var(--muted); font-size:13px; }
+
+  .badge{ display:inline-block; padding:2px 8px; border-radius:3px; font-size:10.5px; font-weight:700; }
+  .badge.BUY{ background:rgba(51,196,129,0.14); color:#33C481; }
+  .badge.HARD_STOP, .badge.VOL_EXIT{ background:rgba(229,72,77,0.14); color:#E5484D; }
+  .badge.TRAILING_STOP, .badge.SIGNAL_EXIT, .badge.MOM_FLIP{ background:rgba(240,185,11,0.14); color:#F0B90B; }
+  .badge.VOL_REDUCE{ background:rgba(124,156,255,0.14); color:#7C9CFF; }
+
+  footer{ padding:24px 32px 40px; color:var(--muted); font-size:12px; border-top:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Momentum <span class="sep">+</span> Exit Rules <span class="sep">·</span> Backtest</h1>
+    <p>Backtest với PositionManager (entry/exit rules đầy đủ), so sánh với 1/N Equal-Weight benchmark.</p>
+  </div>
+  <nav>
+    <a href="index.html">Hôm nay</a>
+    <a href="backtest.html" class="active">Backtest</a>
+  </nav>
+</header>
+
+<main>
+  <div class="panel" id="engineBanner" style="display:none; border-left:4px solid #fea7e9;"></div>
+  <div class="verdict" id="verdictBox">Đang tính toán...</div>
+
+  <div class="panel" id="costInfoPanel" style="display:none;">
+    <div class="panel-title">CHI PHÍ GIAO DỊCH ÁP DỤNG</div>
+    <p id="costInfoText" style="font-size:13px; color:var(--muted-2); line-height:1.6;"></p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">METRICS ĐẦY ĐỦ — SO SÁNH CÁC PHIÊN BẢN</div>
+    <table id="metricsTable">
+      <thead><tr id="metricsHeaderRow"><th>Metric</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">CUMULATIVE RETURN</div>
+    <div class="chart-wrap">
+      <canvas id="cumChart"></canvas>
+      <div class="chart-fallback" id="cumFallback">Chart.js không tải được — xem bảng metrics ở trên.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">TRADE STATISTICS</div>
+    <div class="stat-grid" id="tradeStats"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">EXIT BREAKDOWN</div>
+    <div class="chart-wrap" style="height:240px;">
+      <canvas id="exitChart"></canvas>
+      <div class="chart-fallback" id="exitFallback">Chart.js không tải được — xem bảng số liệu.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">GIAO DỊCH GẦN NHẤT (ĐÃ MUA / ĐÃ BÁN)</div>
+    <table id="tradesTable">
+      <thead><tr><th>Ngày</th><th>Mã</th><th>Hành động</th><th class="num">Giá vào</th><th class="num">Giá ra</th><th class="num">PnL</th><th>Lý do</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">IC TỪNG FACTOR (PURGED K-FOLD OOS)</div>
+    <table id="icTable">
+      <thead><tr><th>Factor</th><th class="num">Mean IC</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  Momentum + Exit Rules VN30 — không phải khuyến nghị đầu tư. Xem reports/research_note.md để biết chi tiết phương pháp.
+</footer>
+
+<script>
+function fmtPct(x, digits=2){ return (x==null || isNaN(x)) ? '—' : (x*100).toFixed(digits) + '%'; }
+function fmtNum(x, digits=3){ return (x==null || isNaN(x)) ? '—' : Number(x).toFixed(digits); }
+function cls(x){ return (x==null || isNaN(x)) ? '' : (x >= 0 ? 'pos' : 'neg'); }
+
+const bt = BACKTEST_DATA;
+const vs = bt.vs_benchmark;
+const netKey = Object.keys(vs).find(k => k.includes('net'));
+const grossKey = Object.keys(vs).find(k => k.includes('gross'));
+const benchKey = Object.keys(vs).find(k => k.includes('1/N'));
+// Nếu chưa có số "net" (có cost), dùng "gross" làm strat chính — dashboard vẫn hiển thị được
+const primaryKey = netKey || grossKey;
+const strat = vs[primaryKey], bench = vs[benchKey], gross = (netKey && grossKey) ? vs[grossKey] : null;
+
+const eng = bt.engine || {version: 'legacy'};
+const banner = document.getElementById('engineBanner');
+banner.style.display = 'block';
+if (eng.version === 'v2') {
+  const cmp = eng.comparison_vs_legacy;
+  banner.innerHTML = '<div class="panel-title">ENGINE v2 — KHÔNG LOOK-AHEAD CÙNG NGÀY</div><p style="font-size:13px;line-height:1.6;">' +
+    (eng.timing || '') + (cmp ? ` Engine cũ cho Sharpe ${cmp.sharpe_legacy} so với v2 ${cmp.sharpe_v2} (chênh ${cmp.legacy_minus_v2}, SE ≈ ${cmp.sharpe_se_v2}).` : '') +
+    (eng.excess_tstat_vs_1N != null ? ` t-stat return vượt trội so với 1/N: ${eng.excess_tstat_vs_1N}.` : '') + '</p>';
+} else {
+  banner.innerHTML = '<div class="panel-title">⚠️ SỐ LIỆU CỦA ENGINE CŨ (CÓ LOOK-AHEAD CÙNG NGÀY)</div><p style="font-size:13px;line-height:1.6;">' +
+    'Đây là snapshot Ngày 19–22 tính bằng engine cũ — chỉ để minh họa. Chạy <code>python launcher.py</code> để thay bằng số liệu engine v2.</p>';
+}
+
+const costInfo = bt.cost_info;
+if (costInfo && costInfo.cost_rate_applied > 0) {
+  document.getElementById('costInfoPanel').style.display = 'block';
+  document.getElementById('costInfoText').textContent =
+    `Cost áp dụng: ${(costInfo.cost_rate_applied*100).toFixed(2)}%/lệnh. ` +
+    `Tổng cost đã trả (tích lũy toàn backtest): ${(costInfo.total_cost_paid*100).toFixed(2)}%. ${costInfo.note}`;
+} else if (costInfo) {
+  document.getElementById('costInfoPanel').style.display = 'block';
+  document.getElementById('costInfoText').textContent = costInfo.note || '';
+}
+
+const verdictBox = document.getElementById('verdictBox');
+const usingGrossOnly = !netKey && !!grossKey;
+if (strat && bench && strat['Sharpe'] != null && bench['Sharpe'] != null) {
+  const won = strat['Sharpe'] > bench['Sharpe'];
+  const costNote = usingGrossOnly ? ' (số GROSS — chưa trừ transaction cost, xem cảnh báo phía trên)' : ' sau chi phí';
+  let msg = won
+    ? `✅ Momentum+ExitRules THẮNG 1/N${costNote} — Sharpe ${fmtNum(strat['Sharpe'])} vs ${fmtNum(bench['Sharpe'])}.`
+    : `⚠️  Momentum+ExitRules KHÔNG thắng 1/N Equal-Weight${costNote} — Sharpe ${fmtNum(strat['Sharpe'])} vs ${fmtNum(bench['Sharpe'])}.`;
+  if (gross && gross['Sharpe'] != null) {
+    const dropPct = ((gross['Sharpe'] - strat['Sharpe']) / gross['Sharpe'] * 100);
+    msg += ` (Sharpe trước cost: ${fmtNum(gross['Sharpe'])}, giảm ${dropPct.toFixed(1)}% do transaction cost + slippage.)`;
+  }
+  verdictBox.className = 'verdict ' + (won ? 'win' : 'warn');
+  verdictBox.textContent = msg;
+} else {
+  verdictBox.textContent = 'Chưa có dữ liệu backtest — chạy launcher.py để tính.';
+}
+
+// Header động: cột chính (net hoặc gross) + Gross phụ (nếu có cả 2) + Benchmark
+const headerRow = document.getElementById('metricsHeaderRow');
+const primaryLabel = netKey ? 'Momentum+ExitRules (net cost)' : 'Momentum+ExitRules (gross, không cost)';
+const cols = [[primaryKey, primaryLabel]];
+if (gross) cols.push([grossKey, 'Momentum+ExitRules (gross)']);
+cols.push([benchKey, '1/N Equal-Weight']);
+cols.forEach(([key, label]) => {
+  const th = document.createElement('th');
+  th.className = 'num';
+  th.textContent = label;
+  headerRow.appendChild(th);
+});
+
+const metricNames = ['Total Return', 'Ann Return', 'Ann Vol', 'Sharpe', 'Max DD', 'Calmar'];
+const metricsBody = document.querySelector('#metricsTable tbody');
+metricNames.forEach(name => {
+  const tr = document.createElement('tr');
+  let rowHtml = `<td>${name}</td>`;
+  cols.forEach(([key]) => {
+    const val = vs[key]?.[name];
+    const formatted = (name === 'Sharpe' || name === 'Calmar') ? fmtNum(val) : fmtPct(val);
+    rowHtml += `<td class="num">${formatted}</td>`;
+  });
+  tr.innerHTML = rowHtml;
+  metricsBody.appendChild(tr);
+});
+
+try {
+  const cum = bt.cumulative;
+  const datasets = [
+    { label: 'Momentum+ExitRules (net cost)', data: cum.strategy_net, borderColor: '#7C9CFF', backgroundColor: 'rgba(124,156,255,0.08)', fill: true, pointRadius: 0, borderWidth: 1.8, tension: 0.05 },
+  ];
+  if (cum.strategy_gross) {
+    datasets.push({ label: 'Momentum+ExitRules (gross, không cost)', data: cum.strategy_gross, borderColor: '#8e99ad', borderDash: [5,3], fill: false, pointRadius: 0, borderWidth: 1.4, tension: 0.05 });
+  }
+  datasets.push({ label: '1/N Equal-Weight', data: cum.benchmark, borderColor: '#F0B90B', backgroundColor: 'rgba(240,185,11,0.05)', fill: true, pointRadius: 0, borderWidth: 1.8, tension: 0.05 });
+
+  const ctx = document.getElementById('cumChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: cum.dates, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: '#8891A0', font: { size: 11.5 } } } },
+      scales: {
+        y: { grid: { color: '#1F2530' }, ticks: { color: '#8891A0', callback: v => (v*100).toFixed(0)+'%' } },
+        x: { grid: { display: false }, ticks: { color: '#8891A0', maxTicksLimit: 8, font: { size: 10.5 } } },
+      }
+    }
+  });
+} catch (e) {
+  document.getElementById('cumChart').style.display = 'none';
+  document.getElementById('cumFallback').style.display = 'block';
+}
+
+const ts = bt.trade_stats || {};
+const tradeStats = document.getElementById('tradeStats');
+[
+  ['Tổng lệnh MUA', ts.n_buys ?? '—', ''],
+  ['Tổng lệnh BÁN', ts.n_sells ?? '—', ''],
+  ['Win Rate', fmtPct(ts.win_rate, 1), cls((ts.win_rate ?? 0) - 0.5)],
+  ['Avg Hold Days', ts.avg_hold_days ?? '—', ''],
+  ['Avg Win PnL', fmtPct(ts.avg_win_pnl), 'pos'],
+  ['Avg Loss PnL', fmtPct(ts.avg_loss_pnl), 'neg'],
+].forEach(([label, val, c]) => {
+  const div = document.createElement('div');
+  div.className = 'stat';
+  div.innerHTML = `<div class="label">${label}</div><div class="value ${c}">${val}</div>`;
+  tradeStats.appendChild(div);
+});
+
+try {
+  const breakdown = ts.exit_breakdown || {};
+  const labels = Object.keys(breakdown);
+  const values = Object.values(breakdown);
+  const ctx2 = document.getElementById('exitChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Số lần', data: values, backgroundColor: '#7C9CFF', borderRadius: 3 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#1F2530' }, ticks: { color: '#8891A0' } },
+        y: { grid: { display: false }, ticks: { color: '#8891A0', font: { size: 11 } } },
+      }
+    }
+  });
+} catch (e) {
+  document.getElementById('exitChart').style.display = 'none';
+  document.getElementById('exitFallback').style.display = 'block';
+}
+
+const trades = bt.recent_trades || [];
+const tradesBody = document.querySelector('#tradesTable tbody');
+if (trades.length === 0) {
+  tradesBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--muted);">Chưa có giao dịch</td></tr>';
+} else {
+  trades.forEach(t => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${t.date ?? '—'}</td><td>${t.symbol}</td>
+      <td><span class="badge ${t.action}">${t.action}</span></td>
+      <td class="num">${t.entry_px ?? '—'}</td><td class="num">${t.exit_px ?? '—'}</td>
+      <td class="num ${cls(t.pnl)}">${fmtPct(t.pnl)}</td>
+      <td style="font-size:11.5px; color:var(--muted-2);">${t.reason ?? ''}</td>`;
+    tradesBody.appendChild(tr);
+  });
+}
+
+const icSummary = bt.ic_summary || {};
+const icBody = document.querySelector('#icTable tbody');
+Object.entries(icSummary).sort((a,b) => Math.abs(b[1]) - Math.abs(a[1])).forEach(([factor, ic]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${factor}</td><td class="num ${cls(ic)}">${ic.toFixed(4)}</td>`;
+  icBody.appendChild(tr);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentum + Exit Rules — Hành động hôm nay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="vendor_chart.js"></script>
+<script src="embed_data.js"></script>
+<style>
+  :root{
+    --bg:#0A0D12; --panel:#12161D; --panel-2:#161B23; --border:#1F2530;
+    --text:#E7EAEE; --muted:#6B7480; --muted-2:#8891A0;
+    --up:#E5484D;      /* VN convention: TĂNG = ĐỎ */
+    --down:#33C481;    /* VN convention: GIẢM = XANH LÁ */
+    --buy:#33C481; --avoid:#E5484D; --reduce:#F0B90B; --exit:#8b0000; --neutral:#6B7480;
+    --accent:#7C9CFF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; }
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  header{
+    padding:28px 32px 20px; border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px;
+  }
+  .title-block h1{ font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; letter-spacing:-0.01em; }
+  .title-block h1 .sep{color:var(--muted); font-weight:500; margin:0 6px;}
+  .title-block p{color:var(--muted-2); font-size:13.5px; margin-top:6px; max-width:640px; line-height:1.5;}
+  nav a{
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--muted-2);
+    text-decoration:none; border:1px solid var(--border); padding:8px 14px;
+    border-radius:3px; transition:.15s;
+  }
+  nav a:hover{border-color:var(--accent); color:var(--accent);}
+  nav a.active{border-color:var(--accent); color:var(--accent);}
+
+  .demo-banner{
+    margin:16px 32px 0; padding:10px 16px; background:rgba(240,185,11,0.08);
+    border:1px solid rgba(240,185,11,0.35); border-radius:4px;
+    font-size:12px; color:#D9AA3E; font-family:'JetBrains Mono',monospace; line-height:1.6;
+  }
+
+  main{padding:20px 32px 48px;}
+
+  .summary-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:22px; }
+  @media(max-width:900px){ .summary-grid{grid-template-columns:repeat(2,1fr);} }
+  .summary-card{ background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:16px; text-align:center; }
+  .summary-card .n{ font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; }
+  .summary-card .label{ font-size:11.5px; color:var(--muted-2); margin-top:4px; }
+  .summary-card.buy .n{color:var(--buy);} .summary-card.avoid .n{color:var(--avoid);}
+  .summary-card.reduce .n{color:var(--reduce);} .summary-card.exit .n{color:var(--exit);}
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:18px 20px; margin-bottom:20px; }
+  .panel-title{ font-size:12.5px; color:var(--muted-2); font-family:'JetBrains Mono',monospace; margin-bottom:14px; letter-spacing:.02em; }
+
+  .filter-tabs{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .filter-tabs button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; padding:6px 14px; border-radius:20px;
+    border:1px solid var(--border); background:transparent; color:var(--muted-2); cursor:pointer; transition:.15s;
+  }
+  .filter-tabs button.active{ border-color:var(--accent); color:var(--accent); background:rgba(124,156,255,0.08); }
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{ text-align:left; font-size:11px; color:var(--muted); font-weight:500; padding:8px 10px; border-bottom:1px solid var(--border); }
+  th.num, td.num{text-align:right;}
+  td{ padding:9px 10px; border-bottom:1px solid var(--border); font-family:'JetBrains Mono',monospace; }
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,0.02);}
+  .badge{ display:inline-block; padding:3px 9px; border-radius:3px; font-size:11px; font-weight:700; }
+  .badge.BUY{ background:rgba(51,196,129,0.14); color:var(--buy); }
+  .badge.AVOID{ background:rgba(229,72,77,0.14); color:var(--avoid); }
+  .badge.REDUCE{ background:rgba(240,185,11,0.14); color:var(--reduce); }
+  .badge.EXIT{ background:rgba(139,0,0,0.2); color:#ff6b6b; }
+  .badge.NEUTRAL{ background:rgba(107,116,128,0.14); color:var(--neutral); }
+  .pos{color:var(--down);} .neg{color:var(--up);}
+
+  footer{ padding:24px 32px 40px; color:var(--muted); font-size:12px; border-top:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Momentum <span class="sep">+</span> Exit Rules <span class="sep">·</span> Hành động hôm nay</h1>
+    <p>Composite score IC-weighted (Mom_6_1 + Mom_12_1 + Volume_Ratio + TS_Momentum) →
+       PositionManager với 6 exit rule (Hard Stop, Trailing Stop, Vol Exit/Reduce, Signal Exit, Momentum Flip).</p>
+  </div>
+  <nav>
+    <a href="index.html" class="active">Hôm nay</a>
+    <a href="backtest.html">Backtest</a>
+  </nav>
+</header>
+
+<div class="demo-banner" id="dataBanner">Đang tải metadata...</div>
+
+<main>
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <div class="panel">
+    <div class="panel-title">DANH SÁCH HÀNH ĐỘNG — TOÀN BỘ UNIVERSE</div>
+    <div class="filter-tabs" id="filterTabs">
+      <button data-filter="ALL" class="active">Tất cả</button>
+      <button data-filter="BUY">🟢 BUY</button>
+      <button data-filter="AVOID">🔴 AVOID</button>
+      <button data-filter="REDUCE">🟡 REDUCE</button>
+      <button data-filter="EXIT">⛔ EXIT</button>
+      <button data-filter="NEUTRAL">⚪ NEUTRAL</button>
+    </div>
+    <table id="holdingsTable">
+      <thead>
+        <tr><th>Mã</th><th class="num">Giá</th><th class="num">1D%</th><th class="num">Mom-6</th>
+            <th class="num">Mom-12</th><th class="num">Vol Spike</th><th class="num">Comp. Rank</th><th>Signal</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">TRỌNG SỐ IC HIỆN TẠI (COMPOSITE SCORE)</div>
+    <table id="icWeightTable">
+      <thead><tr><th>Factor</th><th class="num">IC Weight</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  Momentum + Exit Rules VN30 — dữ liệu vnstock. Không phải khuyến nghị đầu tư. Xem trang Backtest để đánh giá hiệu quả lịch sử.
+</footer>
+
+<script>
+function fmtNum2(x, digits=2){ return (x==null || isNaN(x)) ? '—' : Number(x).toFixed(digits); }
+function fmtPct(x, digits=1){ return (x==null || isNaN(x)) ? '—' : (x*100).toFixed(digits) + '%'; }
+function cls(x){ return (x==null || isNaN(x)) ? '' : (x >= 0 ? 'pos' : 'neg'); }
+
+const meta = TODAY_DATA.meta;
+document.getElementById('dataBanner').textContent = meta.note;
+
+const summary = TODAY_DATA.summary;
+const summaryGrid = document.getElementById('summaryGrid');
+[
+  ['n_buy', 'BUY', 'buy'], ['n_avoid', 'AVOID', 'avoid'], ['n_reduce', 'REDUCE', 'reduce'],
+  ['n_exit', 'EXIT', 'exit'], ['n_neutral', 'NEUTRAL', ''],
+].forEach(([key, label, cssClass]) => {
+  const div = document.createElement('div');
+  div.className = 'summary-card ' + cssClass;
+  div.innerHTML = `<div class="n">${summary[key]}</div><div class="label">${label}</div>`;
+  summaryGrid.appendChild(div);
+});
+
+const holdings = TODAY_DATA.holdings || [];
+const tbody = document.querySelector('#holdingsTable tbody');
+
+function renderTable(filter) {
+  tbody.innerHTML = '';
+  const filtered = filter === 'ALL' ? holdings : holdings.filter(h => h.signal === filter);
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--muted);">Không có mã nào</td></tr>';
+    return;
+  }
+  filtered.forEach(h => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${h.symbol}</td>
+      <td class="num">${fmtNum2(h.price)}</td>
+      <td class="num ${cls(h.ret_1d)}">${fmtPct(h.ret_1d)}</td>
+      <td class="num ${cls(h.mom_6)}">${fmtPct(h.mom_6)}</td>
+      <td class="num ${cls(h.mom_12)}">${fmtPct(h.mom_12)}</td>
+      <td class="num">${fmtNum2(h.vol_spike)}x</td>
+      <td class="num">${fmtNum2(h.composite_rank)}</td>
+      <td><span class="badge ${h.signal}">${h.signal}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+renderTable('ALL');
+
+document.querySelectorAll('#filterTabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#filterTabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable(btn.dataset.filter);
+  });
+});
+
+const icWeights = TODAY_DATA.ic_weights || {};
+const icBody = document.querySelector('#icWeightTable tbody');
+Object.entries(icWeights).sort((a,b) => Math.abs(b[1]) - Math.abs(a[1])).forEach(([factor, w]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${factor}</td><td class="num ${cls(w)}">${w.toFixed(4)}</td>`;
+  icBody.appendChild(tr);
+});
+</script>
+</body>
+</html>

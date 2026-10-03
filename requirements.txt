@@ -1,0 +1,12 @@
+vnstock>=4.0.7
+pandas>=2.2
+numpy>=2.0
+scipy>=1.16
+scikit-learn>=1.5
+xgboost>=2.0
+shap>=0.45
+matplotlib>=3.8
+pytest>=8.0
+nbformat>=5.10   # dùng để build/validate notebooks
+requests
+pyyaml

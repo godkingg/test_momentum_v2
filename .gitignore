@@ -1,0 +1,76 @@
+# Python environments and local dependencies
+.venv/
+venv/
+env/
+ENV/
+.conda/
+conda-env/
+site-packages/
+lib/
+lib64/
+include/
+Scripts/
+pyvenv.cfg
+
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Jupyter local state
+.ipynb_checkpoints/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local data and generated research outputs
+/data/
+/dashboard/data/
+*.csv
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.hdf5
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated dashboard bundles and reports
+/dashboard/embed_data.js
+/reports/*.png
+/reports/*.jpg
+/reports/*.jpeg
+/reports/*.pdf
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs and local runtime files
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Local editor and tooling files
+.vscode/
+.idea/
+
+# Báo cáo hằng ngày: ảnh/HTML/JSON sinh ra mỗi lần chạy (đã có artifact trên GitHub Actions)
+reports/daily/

@@ -1,0 +1,22 @@
+# Tuỳ chọn: triển khai bằng CLI (`npx wrangler deploy`). Không dùng CLI cũng được — dán worker.js vào Cloudflare Dashboard.
+name = "momentum-vn30-report"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+GH_REPO = "OWNER/REPO"            # ← sửa
+GH_REF = "main"
+GH_WORKFLOW = "report_on_demand.yml"
+DISCORD_PUBLIC_KEY = "PASTE_PUBLIC_KEY_HERE"   # ← Developer Portal → General Information → Public Key
+ALLOWED_GUILD_IDS = ""            # ← khuyến nghị: ID server của bạn
+# ALLOWED_USER_IDS = ""
+# ALLOWED_ROLE_IDS = ""
+USER_COOLDOWN_SECONDS = "180"
+GLOBAL_COOLDOWN_SECONDS = "45"
+
+# Chống spam (khuyến nghị): tạo KV `npx wrangler kv namespace create COOLDOWN` rồi dán id vào đây
+# [[kv_namespaces]]
+# binding = "COOLDOWN"
+# id = "..."
+
+# Secret (KHÔNG ghi vào file): npx wrangler secret put GH_TOKEN
