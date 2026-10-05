@@ -1,0 +1,51 @@
+{
+  "asof": "2026-10-05",
+  "positions": {
+    "SAB": {
+      "entry_date": "2026-09-04",
+      "entry_price": 45.35,
+      "size": 1.0
+    },
+    "VNM": {
+      "entry_date": "2026-09-11",
+      "entry_price": 59.9,
+      "size": 1.0
+    },
+    "HDB": {
+      "entry_date": "2026-09-11",
+      "entry_price": 26.8,
+      "size": 1.0
+    },
+    "VHM": {
+      "entry_date": "2026-09-25",
+      "entry_price": 69.1,
+      "size": 1.0
+    },
+    "VIC": {
+      "entry_date": "2026-10-02",
+      "entry_price": 224.0,
+      "size": 1.0
+    },
+    "STB": {
+      "entry_date": "2026-10-02",
+      "entry_price": 68.4,
+      "size": 1.0
+    },
+    "BSR": {
+      "entry_date": "2026-10-02",
+      "entry_price": 30.45,
+      "size": 1.0
+    },
+    "MCH": {
+      "entry_date": "2026-10-02",
+      "entry_price": 139.2,
+      "size": 1.0
+    },
+    "GAS": {
+      "entry_date": "2026-10-02",
+      "entry_price": 78.8,
+      "size": 1.0
+    }
+  },
+  "generated_at": "23:25 05/10/2026"
+}
