@@ -1,0 +1,18 @@
+{
+  "asof": "2026-10-05",
+  "orders": [
+    {
+      "side": "SELL",
+      "code": "HARD_STOP",
+      "label": "Cắt lỗ cứng",
+      "symbol": "ACB",
+      "price": 21.0,
+      "size_text": "toàn bộ",
+      "pnl": -0.081,
+      "hold_days": 83,
+      "reason": "Giảm -8.1% từ giá mua (ngưỡng -8%)",
+      "rank": 0.714
+    }
+  ],
+  "generated_at": "22:19 05/10/2026"
+}

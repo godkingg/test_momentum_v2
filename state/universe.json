@@ -1,0 +1,36 @@
+{
+  "symbols": [
+    "ACB",
+    "BID",
+    "BSR",
+    "CTG",
+    "FPT",
+    "GAS",
+    "GVR",
+    "HDB",
+    "HPG",
+    "LPB",
+    "MBB",
+    "MCH",
+    "MSN",
+    "MWG",
+    "SAB",
+    "SHB",
+    "SSB",
+    "SSI",
+    "STB",
+    "TCB",
+    "VCB",
+    "VHM",
+    "VIB",
+    "VIC",
+    "VJC",
+    "VNM",
+    "VPB",
+    "VRE"
+  ],
+  "dropped": [
+    "TCX",
+    "VPL"
+  ]
+}
