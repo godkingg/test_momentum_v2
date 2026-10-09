@@ -1,5 +1,18 @@
 {
-  "asof": "2026-10-08",
-  "orders": [],
-  "generated_at": "21:04 08/10/2026"
+  "asof": "2026-10-09",
+  "orders": [
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "ACB",
+      "price": 20.15,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.821
+    }
+  ],
+  "generated_at": "20:50 09/10/2026"
 }
