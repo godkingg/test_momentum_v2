@@ -1,5 +1,18 @@
 {
-  "asof": "2026-10-12",
-  "orders": [],
-  "generated_at": "23:10 12/10/2026"
+  "asof": "2026-10-13",
+  "orders": [
+    {
+      "side": "SELL",
+      "code": "MOM_FLIP",
+      "label": "Momentum đảo chiều",
+      "symbol": "VNM",
+      "price": 58.0,
+      "size_text": "toàn bộ",
+      "pnl": -0.0317,
+      "hold_days": 32,
+      "reason": "Mom-6 = -2.6% < 0 (momentum đảo chiều)",
+      "rank": 0.679
+    }
+  ],
+  "generated_at": "21:37 13/10/2026"
 }
