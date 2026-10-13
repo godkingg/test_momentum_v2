@@ -1,14 +1,9 @@
 {
-  "asof": "2026-10-09",
+  "asof": "2026-10-13",
   "positions": {
     "SAB": {
       "entry_date": "2026-09-04",
       "entry_price": 45.35,
-      "size": 1.0
-    },
-    "VNM": {
-      "entry_date": "2026-09-11",
-      "entry_price": 59.9,
       "size": 1.0
     },
     "HDB": {
@@ -52,5 +47,5 @@
       "size": 1.0
     }
   },
-  "generated_at": "21:42 09/10/2026"
+  "generated_at": "22:18 13/10/2026"
 }
