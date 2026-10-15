@@ -1,18 +1,18 @@
 {
-  "asof": "2026-10-14",
+  "asof": "2026-10-15",
   "orders": [
     {
       "side": "SELL",
       "code": "HARD_STOP",
       "label": "Cắt lỗ cứng",
-      "symbol": "VHM",
-      "price": 61.0,
+      "symbol": "STB",
+      "price": 62.8,
       "size_text": "toàn bộ",
-      "pnl": -0.1172,
-      "hold_days": 19,
-      "reason": "Giảm -11.7% từ giá mua (ngưỡng -8%)",
-      "rank": 0.929
+      "pnl": -0.0819,
+      "hold_days": 13,
+      "reason": "Giảm -8.2% từ giá mua (ngưỡng -8%)",
+      "rank": 0.964
     }
   ],
-  "generated_at": "19:26 14/10/2026"
+  "generated_at": "19:10 15/10/2026"
 }
