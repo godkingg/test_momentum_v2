@@ -1,5 +1,5 @@
 {
-  "asof": "2026-10-14",
+  "asof": "2026-10-15",
   "positions": {
     "SAB": {
       "entry_date": "2026-09-04",
@@ -14,11 +14,6 @@
     "VIC": {
       "entry_date": "2026-10-02",
       "entry_price": 224.0,
-      "size": 1.0
-    },
-    "STB": {
-      "entry_date": "2026-10-02",
-      "entry_price": 68.4,
       "size": 1.0
     },
     "BSR": {
@@ -42,5 +37,5 @@
       "size": 1.0
     }
   },
-  "generated_at": "20:07 14/10/2026"
+  "generated_at": "19:53 15/10/2026"
 }
