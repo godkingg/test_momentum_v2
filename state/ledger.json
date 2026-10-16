@@ -1,5 +1,5 @@
 {
-  "asof": "2026-10-15",
+  "asof": "2026-10-16",
   "positions": {
     "SAB": {
       "entry_date": "2026-09-04",
@@ -35,7 +35,22 @@
       "entry_date": "2026-10-09",
       "entry_price": 20.15,
       "size": 1.0
+    },
+    "SSB": {
+      "entry_date": "2026-10-16",
+      "entry_price": 16.15,
+      "size": 1.0
+    },
+    "STB": {
+      "entry_date": "2026-10-16",
+      "entry_price": 62.8,
+      "size": 1.0
+    },
+    "VHM": {
+      "entry_date": "2026-10-16",
+      "entry_price": 61.0,
+      "size": 1.0
     }
   },
-  "generated_at": "19:53 15/10/2026"
+  "generated_at": "19:45 16/10/2026"
 }
