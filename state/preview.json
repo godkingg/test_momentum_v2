@@ -1,18 +1,42 @@
 {
-  "asof": "2026-10-15",
+  "asof": "2026-10-16",
   "orders": [
     {
-      "side": "SELL",
-      "code": "HARD_STOP",
-      "label": "Cắt lỗ cứng",
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "SSB",
+      "price": 16.15,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.929
+    },
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
       "symbol": "STB",
       "price": 62.8,
-      "size_text": "toàn bộ",
-      "pnl": -0.0819,
-      "hold_days": 13,
-      "reason": "Giảm -8.2% từ giá mua (ngưỡng -8%)",
-      "rank": 0.964
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.893
+    },
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "VHM",
+      "price": 61.0,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.75
     }
   ],
-  "generated_at": "19:10 15/10/2026"
+  "generated_at": "18:56 16/10/2026"
 }
