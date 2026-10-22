@@ -1,30 +1,5 @@
 {
-  "asof": "2026-10-21",
-  "orders": [
-    {
-      "side": "SELL",
-      "code": "TRAILING_STOP",
-      "label": "Trailing stop",
-      "symbol": "BSR",
-      "price": 28.1,
-      "size_text": "toàn bộ",
-      "pnl": -0.0772,
-      "hold_days": 19,
-      "reason": "Giảm -12.2% từ đỉnh (ngưỡng -12%)",
-      "rank": 0.929
-    },
-    {
-      "side": "SELL",
-      "code": "MOM_FLIP",
-      "label": "Momentum đảo chiều",
-      "symbol": "VHM",
-      "price": 61.8,
-      "size_text": "toàn bộ",
-      "pnl": 0.0131,
-      "hold_days": 5,
-      "reason": "Mom-6 = -0.7% < 0 (momentum đảo chiều)",
-      "rank": 0.643
-    }
-  ],
-  "generated_at": "19:28 21/10/2026"
+  "asof": "2026-10-22",
+  "orders": [],
+  "generated_at": "19:30 22/10/2026"
 }
