@@ -1,5 +1,30 @@
 {
-  "asof": "2026-10-29",
-  "orders": [],
-  "generated_at": "20:45 29/10/2026"
+  "asof": "2026-10-30",
+  "orders": [
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "VHM",
+      "price": 63.0,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.679
+    },
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "VPB",
+      "price": 22.95,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.714
+    }
+  ],
+  "generated_at": "20:38 30/10/2026"
 }
