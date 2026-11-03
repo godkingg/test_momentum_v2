@@ -1,18 +1,30 @@
 {
-  "asof": "2026-11-02",
+  "asof": "2026-11-03",
   "orders": [
+    {
+      "side": "SELL",
+      "code": "HARD_STOP",
+      "label": "Cắt lỗ cứng",
+      "symbol": "BSR",
+      "price": 26.3,
+      "size_text": "toàn bộ",
+      "pnl": -0.0947,
+      "hold_days": 11,
+      "reason": "Giảm -9.5% từ giá mua (ngưỡng -8%)",
+      "rank": 1.0
+    },
     {
       "side": "SELL",
       "code": "MOM_FLIP",
       "label": "Momentum đảo chiều",
-      "symbol": "VHM",
-      "price": 62.0,
+      "symbol": "STB",
+      "price": 66.6,
       "size_text": "toàn bộ",
-      "pnl": -0.0159,
-      "hold_days": 3,
-      "reason": "Mom-6 = -6.7% < 0 (momentum đảo chiều)",
-      "rank": 0.571
+      "pnl": 0.0605,
+      "hold_days": 18,
+      "reason": "Mom-6 = -1.3% < 0 (momentum đảo chiều)",
+      "rank": 0.75
     }
   ],
-  "generated_at": "23:36 02/11/2026"
+  "generated_at": "21:41 03/11/2026"
 }
