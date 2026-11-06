@@ -1,5 +1,42 @@
 {
-  "asof": "2026-11-05",
-  "orders": [],
-  "generated_at": "21:59 05/11/2026"
+  "asof": "2026-11-06",
+  "orders": [
+    {
+      "side": "SELL",
+      "code": "HARD_STOP",
+      "label": "Cắt lỗ cứng",
+      "symbol": "SSB",
+      "price": 14.8,
+      "size_text": "toàn bộ",
+      "pnl": -0.0836,
+      "hold_days": 21,
+      "reason": "Giảm -8.4% từ giá mua (ngưỡng -8%)",
+      "rank": 0.786
+    },
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "BSR",
+      "price": 26.25,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 1.0
+    },
+    {
+      "side": "BUY",
+      "code": "BUY",
+      "label": "Vào lệnh theo rank",
+      "symbol": "SSB",
+      "price": 14.8,
+      "size_text": "100%",
+      "pnl": null,
+      "hold_days": null,
+      "reason": "Entry OK",
+      "rank": 0.786
+    }
+  ],
+  "generated_at": "21:38 06/11/2026"
 }
